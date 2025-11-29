@@ -1,0 +1,145 @@
+Step 1: Set Up the Environment
+
+Install Python libraries:
+
+pip install opencv-python tensorflow numpy matplotlib
+
+
+You’ll use:
+
+TensorFlow → load a pretrained MobileNetV2 model
+
+OpenCV → capture live camera feed
+
+NumPy → preprocess frames
+
+Step 2: Choose and Download a Pretrained Model
+
+We'll use MobileNetV2 pretrained on ImageNet.
+
+👉 But since ImageNet does NOT have a “plastic vs non-plastic” category, you must supply a simple rule for classification:
+
+If the predicted label contains things linked to plastic (e.g., bottle, cup, packet, container), classify as Plastic
+
+Otherwise → Non-Plastic
+
+Download the model in code (no manual download needed):
+
+import tensorflow as tf
+
+model = tf.keras.applications.MobileNetV2(weights='imagenet')
+
+
+Also load the ImageNet preprocessing utilities:
+
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input, decode_predictions
+
+Step 3: Define Plastic Keywords
+
+Create a small list to determine what counts as "plastic":
+
+PLASTIC_KEYWORDS = [
+    "bottle", "packet", "plastic", "bag", "water bottle",
+    "container", "jug", "cup"
+]
+
+Step 4: Run Real-Time Prediction from Your Camera
+
+Below is the complete, simple code to classify plastic vs non-plastic using the pretrained model:
+
+import cv2
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input, decode_predictions
+
+# Load pretrained MobileNetV2
+model = tf.keras.applications.MobileNetV2(weights='imagenet')
+
+# Keywords to detect plastic-like objects
+PLASTIC_KEYWORDS = [
+    "bottle", "packet", "plastic", "bag", "water bottle",
+    "container", "cup"
+]
+
+cap = cv2.VideoCapture(0)  # default camera
+
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    # Resize to model input size 224x224
+    img = cv2.resize(frame, (224, 224))
+    img = np.expand_dims(img, axis=0)
+    img = preprocess_input(img)
+
+    # Make prediction
+    preds = model.predict(img)
+    decoded = decode_predictions(preds, top=1)[0][0]
+    label = decoded[1]  # predicted class name (string)
+
+    # Determine plastic / non-plastic
+    if any(keyword in label.lower() for keyword in PLASTIC_KEYWORDS):
+        text = f"Plastic ({label})"
+        color = (0, 255, 0)
+    else:
+        text = f"Non-Plastic ({label})"
+        color = (0, 0, 255)
+
+    # Display result
+    cv2.putText(frame, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
+    cv2.imshow("Plastic Detection", frame)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+
+Step 5: Test the System
+
+Raise an object to the camera:
+
+If MobileNetV2 identifies something plastic-related → "Plastic"
+
+Otherwise → "Non-Plastic"
+
+Press Q to quit.
+
+Step 6: Improve the System (Optional)
+
+You can refine classification quality by:
+
+✓ Using a real plastic-detection model
+
+(e.g., an object-detection model trained for recycling streams)
+
+✓ Creating a better keyword mapping
+
+Include:
+
+plastic bottle
+
+detergent bottle
+
+food container
+
+plastic cup
+
+plastic bag
+
+✓ Fine-tuning MobileNetV2 on your own small dataset
+
+(Add 50–100 images and retrain the last layers.)
+
+Summary
+
+You now have a complete system that:
+
+Uses a pretrained ImageNet model
+
+Classifies frames from the PC camera
+
+Tags objects as Plastic / Non-Plastic using simple logic
+
+Runs in real-time with OpenCV

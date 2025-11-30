@@ -4,7 +4,6 @@ Install Python libraries:
 
 pip install opencv-python tensorflow numpy matplotlib
 
-
 You’ll use:
 
 TensorFlow → load a pretrained MobileNetV2 model
@@ -17,7 +16,7 @@ Step 2: Choose and Download a Pretrained Model
 
 We'll use MobileNetV2 pretrained on ImageNet.
 
-👉 But since ImageNet does NOT have a “plastic vs non-plastic” category, you must supply a simple rule for classification:
+But since ImageNet does NOT have a “plastic vs non-plastic” category, you must supply a simple rule for classification:
 
 If the predicted label contains things linked to plastic (e.g., bottle, cup, packet, container), classify as Plastic
 

@@ -1,5 +1,6 @@
-Plastic Detection ML Model
-Overview
+**Plastic Detection ML Model**
+
+**Overview**
 This project develops a machine learning model for detecting plastic objects in real-time camera feeds. The goal is to enable applications such as waste sorting, environmental monitoring, and recycling automation. Two primary approaches are implemented: fine-tuning a pre-trained object detection model and building a custom classification model from scratch using curated datasets.
 Approache:
 Fine-Tuning an Object Detection Model

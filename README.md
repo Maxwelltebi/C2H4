@@ -36,7 +36,7 @@ Libraries: TensorFlow, OpenCV, NumPy, Pandas, Scikit-learn
 **Installation**
 
 
-Clone the repository: git clone https://github.com/yourusername/plastic-detection-ml.git
+Clone the repository: git clone https://github.com/Maxwelltebi/C2H4.git
 
 Install dependencies: pip install -r requirements.txt
 

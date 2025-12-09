@@ -1,42 +1,32 @@
 import cv2
-import numpy as np
+import torch
 import tensorflow as tf
-from tensorflow.keras.applications.mobilenet_v2 import preprocess_input , decode_predictions
+import matplotlib.pyplot as plt
 
-model = tf.keras.applications.MobileNetV2(weights='imagenet')
+print("Libraries installed successfully!")
 
-PLASTIC_KEYWORDS = [
-    "bottle", "packet", "plastic", "bag", "water bottle",
-    "container", "cup"
-]
+# Load the trained model
+model = torch.load("runs/train/exp/weights/best.pt")
 
-cap = cv2.VideoCapture(0)  # default camera
+# Initialize video capture
+cap = cv2.VideoCapture(0)  # 0 for default webcam
 
 while True:
     ret, frame = cap.read()
     if not ret:
         break
 
-    # Resize to model input size 224x224
-    img = cv2.resize(frame, (224, 224))
-    img = np.expand_dims(img, axis=0)
-    img = preprocess_input(img)
+    # Preprocess the frame
+    results = model(frame)  # Run inference on the frame
 
-    # Make prediction
-    preds = model.predict(img)
-    decoded = decode_predictions(preds, top=1)[0][0]
-    label = decoded[1]  # predicted class name (string)
+    # Extract bounding boxes and labels
+    boxes = results.xywh[0]  # Get bounding boxes for plastic objects
+    for box in boxes:
+        # Draw bounding boxes
+        x1, y1, x2, y2 = map(int, box[:4])
+        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-    # Determine plastic / non-plastic
-    if any(keyword in label.lower() for keyword in PLASTIC_KEYWORDS):
-        text = f"Plastic ({label})"
-        color = (0, 255, 0)
-    else:
-        text = f"Non-Plastic ({label})"
-        color = (0, 0, 255)
-
-    # Display result
-    cv2.putText(frame, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
+    # Show the frame with detected plastics
     cv2.imshow("Plastic Detection", frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):

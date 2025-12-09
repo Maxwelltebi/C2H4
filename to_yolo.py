@@ -1,13 +1,7 @@
 import pandas as pd
-import os
 
 # Load the CSV data
-df = pd.read_csv('path_to_annotations.csv')
-
-# Ensure the 'labels' folder exists in the parent directory
-labels_path = 'labels'  # Parent directory for labels
-if not os.path.exists(labels_path):
-    os.makedirs(labels_path)
+df = pd.read_csv('path_to_annoD:\Technologia\ML\C2H4\dataset\test\_annotations.csv')
 
 # Function to convert to YOLO format
 def convert_to_yolo(row):
@@ -29,12 +23,11 @@ def convert_to_yolo(row):
     bbox_width = (xmax - xmin) / width
     bbox_height = (ymax - ymin) / height
     
-    # Save the YOLO formatted annotation to a text file in the 'labels' folder
-    label_filename = os.path.splitext(filename)[0] + '.txt'  # Create the text file with same name as image
-    label_filepath = os.path.join(labels_path, label_filename)
-    
-    with open(label_filepath, 'a') as label_file:
-        label_file.write(f"{class_id} {center_x} {center_y} {bbox_width} {bbox_height}\n")
+    # Save the YOLO formatted annotation to a text file
+    yolo_annotation = f"{class_id} {center_x} {center_y} {bbox_width} {bbox_height}\n"
+    label_filename = filename.replace('.jpg', '.txt')  # Assuming images are .jpg
+    with open(f"labels/{label_filename}", "a") as file:
+        file.write(yolo_annotation)
 
 # Apply conversion to each row in the CSV
 df.apply(convert_to_yolo, axis=1)

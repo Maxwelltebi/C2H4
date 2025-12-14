@@ -1,3 +1,6 @@
 venv/
 .env/
 dataset/
+labels/
+updated_annotations.csv/
+yolov5/
